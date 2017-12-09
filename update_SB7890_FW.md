@@ -1,4 +1,4 @@
-#use to update the SB7890 Mellanox IB unmanaged Switch
+# Use to update the SB7890 Mellanox IB unmanaged Switch
 ```
 
 [root@stark23 sync]# cat sb7890_fw_check.sh
