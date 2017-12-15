@@ -1,7 +1,7 @@
 # 2017-11-15 expect cmd example for check the FW level
 
-## install the epxect cmd 
-## write your script here 
+## 1 install the epxect cmd 
+## 2 write your script here 
 ```
 [root@mgt ~]# cat check_fw_level.exp
 #!/usr/bin/expect
@@ -26,8 +26,8 @@ send "\r"
 #send "exit\r"
 
 ``` 
-## update the scripte with execute permission 
-## vefify the result 
+## 3 update the scripte with execute permission  "chmod 755 xxx"
+## 4 vefify the result 
 
 ```
 
@@ -49,7 +49,7 @@ system> [root@mgt ~]#
 
 ```
 ##  another example for the FFDC log download
-### make sure tftp server with download permissions 
+### make sure tftp server with download permissions "man tftpd"
 ### chmod -R 777 /tftpboot
 ### 
 ## Code Example for Lenovo ThinkSystem Stark SD530 
