@@ -27,6 +27,6 @@
 5. smm10-smm18 connect to the second switch port 37-45
 6. if the rack with OPA card ,in most case ,node01-node24 OPA port connect ot the first  OPA switch,node25-node48 connect to the second OPA switch ,node 49-node72 is ocnnect to the third switch
 7. if the rack with the Mellanox EDR IB switch ,then since Mellanox Switch  have only 36 port (in general),so 18 port per group in most case ,so will have 4 IB switch configure in this rack 
-8 we will base on the OPA Switch or IB switch to do the group Linpack stress test , all node in the same OPA/IB switch will be work a one Group and do the Linpack stress Test
+8. we will base on the OPA Switch or IB switch to do the group Linpack stress test , all node in the same OPA/IB switch will be work a one Group and do the Linpack stress Test
 --- 
 #  === END ===  
