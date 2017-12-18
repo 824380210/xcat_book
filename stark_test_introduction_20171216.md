@@ -20,12 +20,12 @@
 ![Stark Rack ](http://img0.ph.126.net/fKClw05HFg6BaGsnXXkefw==/6632527917144333480.png)
 
 ## stark rack introduction
-1. 18 stark chassis ,so 18*4 node = 72 node per chassis 
+1. 18 stark chassis ,so 18*4 node = 72 node per Rack 
 2. node01-node36 connect to the first switch port 1-36
 3. smm01-smm09 connect to the first switch port 37-45
 4. node37-node72 connect to the second switch port 1-36
 5. smm10-smm18 connect to the second switch port 37-45
-6. if the rack with OPA card ,in most case ,node01-node24 OPA port connect ot the first  OPA switch,node25-node48 connect to the second OPA switch ,node 49-node72 is ocnnect to the third switch
+6. if the rack with OPA card ,in most case ,node01-node24 OPA port connect ot the first  OPA switch,node25-node48 connect to the second OPA switch ,node 49-node72 is ocnnect to the third switch(in general : OPA Switch provide 48 OPA port)
 7. if the rack with the Mellanox EDR IB switch ,then since Mellanox Switch  have only 36 port (in general),so 18 port per group in most case ,so will have 4 IB switch configure in this rack 
 8. we will base on the OPA Switch or IB switch to do the group Linpack stress test , all node in the same OPA/IB switch will be work a one Group and do the Linpack stress Test
 --- 
