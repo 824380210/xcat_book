@@ -1,4 +1,4 @@
-#code to read SMM version with IPMI command 
+# code to read SMM version with IPMI command 
 # use for Lenovo ThinkSystem SD530 SMM only
 ## exmaple here 
 ```
@@ -36,4 +36,4 @@ mystr = "".join(result)
 print mystr
 
 ```
-
+###
