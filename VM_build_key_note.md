@@ -215,4 +215,41 @@ gpgcheck=0
 [root@mgt1 ~]#
 
 ```
+###  8 启用lenovo-confluent web监控业务
+```
+yum install lenovo-confluent lenovo-onecli
+```
+###  9 通用的xcat服务配置
+```
+
+
+#!/bin/bash
+#
+iptables -F
+#
+getenforce
+#
+cat /etc/hosts
+#
+chtab key=master site.value=mgt1
+chtab key=domain site.value=cluster
+chtab key=dhcpinterfaces site.value=ens8
+chtab key=nameserver site.value=172.20.0.1
+#chtab key=consoelservice site.value=confluent
+chtab net=172.20.0.0 networks.dynamicrange=172.20.255.1-172.20.255.254
+chtab node=compute nodehm.serialport=0 nodehm.serialspeed=115200 nodehm.serialflow=hard
+chtab node=compute nodetype.os=rhels7.4 nodetype.arch=x86_64 nodetype.Profile=compute
+chtab node=compute noderes.netboot=xnba noderes.nfsserver=172.20.0.1 noderes.installnic=mac noderes.primarynic=mac
+#
+
+```
+### 10 添加节点，XCC，IMM或者BMC，SMM（如果有的话）
+```
+
+
+```
+### 11: 以太网交换机配置
+
+
+### 12：添加switch/switches表的配置
 
