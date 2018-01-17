@@ -406,7 +406,7 @@ firmware.csv       kitrepo.csv       monitoring.csv      nodehm.csv      osdistr
 [root@oc1 xcat]# ls
 auditlog.sqlite       eventlog.sqlite      kvm_masterdata.sqlite  networks.sqlite      osdistro.sqlite        ppc.sqlite          taskstate.sqlite
 ......
-
+```
 ---
 
 ##  Add OceanCat node , XCC , switches  for testing
