@@ -169,7 +169,7 @@ verify the installations is ok or not
 
 ```
 
-### 9 : restore the default tables settings (very import to all of us)
+### 9 : restore the default tables settings (very important to all of us)
 ```
 [root@oc1 ~]# cd /opt/xcat/share/xcat/templates/e1350/
 [root@oc1 e1350]# for a in *csv; do tabrestore $a; echo $a; done
@@ -184,7 +184,9 @@ nodetype.csv
 passwd.csv
 servicenode.csv
 switch.csv
-[root@oc1 e1350]#
+[root@oc1 e1350]#cd
+
+```
 ### 10 : build the osimage for future use
 ```
 [root@oc1 ~]# copycds rhel-server-7.4-x86_64-dvd.iso
@@ -208,17 +210,115 @@ rhels7.4-x86_64-statelite-compute  (osimage)
 ```
 ### 12 : xCAT networks Table configure example
 ```
+[root@oc1 ~]# chtab net=172.20.0.0 networks.dynamicrange=172.20.255.1-172.20.255.254 networks.netname="data"
+[root@oc1 ~]# chtab -d net=192.168.122.0  networks
+
+[root@oc1 ~]# chtab net=172.29.0.0 networks.netname="bmc-network"
+[root@oc1 ~]# chtab net=172.30.0.0 networks.netname="out-band"
+
+
+
 ```
-### 13 : xCAT networks Table configure example
+ example of the default output should look like as :
 ```
+[root@oc1 ~]# tabdump networks
+#netname,net,mask,mgtifname,gateway,dhcpserver,tftpserver,nameservers,ntpservers,logservers,dynamicrange,staticrange,staticrangeincrement,nodehostname,ddnsdomain,vlanid,domain,mtu,comments,disable
+"data","172.20.0.0","255.255.0.0","ens8","<xcatmaster>",,"<xcatmaster>",,,,"172.20.255.1-172.20.255.254",,,,,,,"1500",,
+"bmc-network","172.29.0.0","255.255.0.0","ens8","<xcatmaster>",,"<xcatmaster>",,,,,,,,,,,"1500",,
+"out-band","172.30.0.0","255.255.0.0","ens8","<xcatmaster>",,"<xcatmaster>",,,,,,,,,,,"1500",,
+
 ```
 
-### 14 : xCAT networks Table configure example
+
+
+### 13 : xCAT nodehm  Table configure example
 ```
+[root@oc1 ~]# chtab node=compute nodehm.serialport=0 nodehm.serialspeed=115200 nodehm.serialflow=hard
+[root@oc1 ~]# tabdump nodehm
+#node,power,mgt,cons,termserver,termport,conserver,serialport,serialspeed,serialflow,getmac,cmdmapping,consoleondemand,comments,disable
+"ipmi",,"ipmi",,,,,,,,,,,,
+"blade",,"blade",,,,,,,,,,,,
+"cyclades",,,"cyclades",,,,,,,,,,,
+"mrv",,,"mrv",,,,,,,,,,,
+"x3250",,"ipmi","ipmi",,,,"0","115200",,,,,,
+"x3550",,"ipmi","ipmi",,,,"0","115200",,,,,,
+"x3650",,"ipmi","ipmi",,,,"0","115200",,,,,,
+"dx360",,"ipmi","ipmi",,,,"0","115200",,,,,,
+"x220",,"ipmi","ipmi",,,,"0","115200",,,,,,
+"x240",,"ipmi","ipmi",,,,"0","115200",,,,,,
+"x440",,"ipmi","ipmi",,,,"0","115200",,,,,,
+"compute",,,,,,,"0","115200","hard",,,,,
+[root@oc1 ~]#
+
+
 ```
-### 15 : xCAT networks Table configure example
+
+### 14 : xCAT nodetype Table configure example
+
+
+
 ```
+[root@oc1 ~]# chtab node=compute nodetype.os=rhels7.4 nodetype.arch=x86_64 nodetype.Profile=compute
+[root@oc1 ~]# tabdump nodetype
+#node,os,arch,profile,provmethod,supportedarchs,nodetype,comments,disable
+"compute","rhels7.4","x86_64","compute",,,,,
+"x3250",,,,,,"osi",,
+"x3550",,,,,,"osi",,
+"x3650",,,,,,"osi",,
+"dx360",,,,,,"osi",,
+"x220",,,,,,"mp",,
+"x240",,,,,,"mp",,
+"x440",,,,,,"mp",,
+[root@oc1 ~]#
+
+
+
+
 ```
-### 16 : xCAT networks Table configure example
+### 15 : xCAT noderes Table configure example
+
 ```
+[root@oc1 ~]# chtab node=compute noderes.netboot=xnba noderes.nfsserver=172.20.0.1 noderes.installnic=mac noderes.primarynic=mac
+[root@oc1 ~]# tabdump noderes
+#node,servicenode,netboot,tftpserver,tftpdir,nfsserver,monserver,nfsdir,installnic,primarynic,discoverynics,cmdinterface,xcatmaster,current_osimage,next_osimage,nimserver,routenames,nameservers,proxydhcp,syslog,comments,disable
+"compute",,"xnba",,,"172.20.0.1",,,"mac","mac",,,,,,,,,,,,
+
+
+
 ```
+### 16 : backup the default tables for future use (/etc/xcat/ is the default location for store the tables)
+```
+[root@oc1 ~]# dumpxCATdb -p /root/default_without_node_xCAT_Table
+ Creating /root/default_without_node_xCAT_Table for database dump
+Backup Complete.
+[root@oc1 ~]# ls /root/default_without_node_xCAT_Table/
+bootparams.csv     hosts.csv         kvm_masterdata.csv  monsetting.csv  nodelist.csv        osimage.csv      ppcdirect.csv    statelite.csv  vmmaster.csv
+boottarget.csv     hwinv.csv         kvm_nodedata.csv    mpa.csv         nodepos.csv         passwd.csv       ppchcp.csv       storage.csv    vpd.csv
+cfgmgt.csv         hypervisor.csv    linuximage.csv      mp.csv          noderes.csv         pdu.csv          prescripts.csv   switch.csv     websrv.csv
+chain.csv          ipmi.csv          litefile.csv        networks.csv    nodetype.csv        pduoutlet.csv    prodkey.csv      switches.csv   winimage.csv
+deps.csv           iscsi.csv         litetree.csv        nics.csv        notification.csv    performance.csv  rack.csv         taskstate.csv  zone.csv
+discoverydata.csv  kitcomponent.csv  mac.csv             nimimage.csv    openbmc.csv         policy.csv       routes.csv       token.csv      zvm.csv
+domain.csv         kit.csv           mic.csv             nodegroup.csv   osdistro.csv        postscripts.csv  servicenode.csv  virtsd.csv
+firmware.csv       kitrepo.csv       monitoring.csv      nodehm.csv      osdistroupdate.csv  ppc.csv          site.csv         vm.csv
+
+
+
+[root@oc1 xcat]# ls
+auditlog.sqlite       eventlog.sqlite      kvm_masterdata.sqlite  networks.sqlite      osdistro.sqlite        ppc.sqlite          taskstate.sqlite
+bootparams.sqlite     firmware.sqlite      kvm_nodedata.sqlite    nics.sqlite          osdistroupdate.sqlite  prescripts.sqlite   token.sqlite
+boottarget.sqlite     hostkeys             linuximage.sqlite      nimimage.sqlite      osimage.sqlite         prodkey.sqlite      virtsd.sqlite
+ca                    hosts.sqlite         litefile.sqlite        nodegroup.sqlite     passwd.sqlite          rack.sqlite         vmmaster.sqlite
+cert                  hwinv.sqlite         litetree.sqlite        nodehm.sqlite        pduoutlet.sqlite       routes.sqlite       vm.sqlite
+cfgmgt.sqlite         hypervisor.sqlite    mac.sqlite             nodelist.sqlite      pdu.sqlite             servicenode.sqlite  vpd.sqlite
+chain.sqlite          ipmi.sqlite          mic.sqlite             nodepos.sqlite       performance.sqlite     site.sqlite         websrv.sqlite
+conf.orig             iscsi.sqlite         monitoring.sqlite      noderes.sqlite       policy.sqlite          statelite.sqlite    winimage.sqlite
+deps.sqlite           kitcomponent.sqlite  monsetting.sqlite      nodetype.sqlite      postscripts.sqlite     storage.sqlite      zone.sqlite
+discoverydata.sqlite  kitrepo.sqlite       mpa.sqlite             notification.sqlite  ppcdirect.sqlite       switches.sqlite     zvm.sqlite
+domain.sqlite         kit.sqlite           mp.sqlite              openbmc.sqlite       ppchcp.sqlite          switch.sqlite
+[root@oc1 xcat]#
+
+
+```
+
+
+
