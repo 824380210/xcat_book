@@ -561,7 +561,52 @@ node06
 
 
 
-###
+###  setup name resolution related and other service 
+
+```
+[root@oc1 ~]# makehosts ipmi
+[root@oc1 ~]# makehosts bmc
+[root@oc1 ~]# makehosts switch
+[root@oc1 ~]# makehosts bmcsw
+[root@oc1 ~]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+172.20.0.1      oc1 oc1.cluster mgt     mgt.cluster
+172.20.101.1 node01 node01.cluster
+172.20.101.2 node02 node02.cluster
+172.20.101.3 node03 node03.cluster
+172.20.101.4 node04 node04.cluster
+172.20.101.5 node05 node05.cluster
+...
+
+
+   61  makehosts ipmi
+   62  makehosts bmc
+   63  makehosts switch
+   64  makehosts bmcsw
+   65  cat /etc/hosts
+   66  makedns -n
+   67  makedhcp -n
+   68  service dhcpd restart
+   69  history
+[root@oc1 ~]# mknb x86_64
+Creating genesis.fs.x86_64.gz in /tftpboot/xcat
+[root@oc1 ~]#
+
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
 ## Add FPC (Fan Power Controller ) for testing
 
 ```
@@ -569,3 +614,81 @@ node06
 
 
 ```
+
+
+
+
+
+===
+
+---
+
+
+```
+
+[root@oc1 ~]# lsdef node01-xcc
+Object name: node01-xcc
+    groups=bmc,72bmcperrack,36bmcpersw
+    ip=172.29.101.1
+    postbootscripts=otherpkgs
+    postscripts=syslog,remoteshell,syncfiles
+    switch=bmcsw1
+    switchport=1
+[root@oc1 ~]# chdef node01-xcc switch=switch1 switchport=37
+1 object definitions have been created or modified.
+[root@oc1 ~]# lsdef node01-xcc
+Object name: node01-xcc
+    groups=bmc,72bmcperrack,36bmcpersw
+    ip=172.29.101.1
+    postbootscripts=otherpkgs
+    postscripts=syslog,remoteshell,syncfiles
+    switch=switch1
+    switchport=37
+[root@oc1 ~]#
+```
+
+some test defined in xcat systems
+
+```
+[root@oc1 ~]# makeconfluentcfg bmc
+[root@oc1 ~]# nodeattrib node01-xcc
+node01-xcc: console.logging: full
+node01-xcc: discovery.policy: open
+node01-xcc: groups: bmc,72bmcperrack,36bmcpersw,everything
+node01-xcc: net.switch: switch1
+node01-xcc: net.switchport: 37
+node01-xcc: secret.hardwaremanagementpassword: ********
+node01-xcc: secret.hardwaremanagementuser: ********
+
+
+###
+
+```
+[root@oc1 ~]# cat /var/log/confluent/events
+Jan 17 11:56:54 {"error": "Timeout or bad SNMPv1 community string trying to reach switch 'switch2'"}
+Jan 17 11:56:54 {"error": "Timeout or bad SNMPv1 community string trying to reach switch 'bmcsw1'"}
+Jan 17 11:56:54 {"error": "Timeout or bad SNMPv1 community string trying to reach switch 'switch1'"}
+Jan 17 11:56:54 {"error": "Timeout or bad SNMPv1 community string trying to reach switch 'bmcsw2'"}
+Jan 17 11:56:54 {"info": "Detected unknown XCC with hwaddr 8c:0f:6f:7e:d5:61 at address fe80::8e0f:6fff:fe7e:d561%ens8"}
+Jan 17 11:56:55 {"info": "Detected unknown XCC with hwaddr 8c:0f:6f:7e:d6:51 at address fe80::8e0f:6fff:fe7e:d651%ens8"}
+
+
+
+RS G8000#show mac-address-table
+Mac address Aging Time: 300
+
+     MAC address     VLAN  Port     Trnk  State  Permanent
+  -----------------  ----  -------  ----  -----  ---------
+  8c:0f:6f:7e:d5:61     1  37              FWD
+  8c:0f:6f:7e:d6:51     1  38              FWD
+  90:e2:ba:78:f5:55     1  44              FWD
+
+
+[root@oc1 ~]# snmpwalk -Os -v1 -c RO switch1 1.3.6.1.2.1.1.1
+sysDescr.0 = STRING: IBM Networking Operating System RackSwitch G8000 (BW build)
+
+
+```
+
+```
+
