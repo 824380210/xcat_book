@@ -125,6 +125,8 @@ start to install the xCAT and confluent packages
 ```
 yum install xCAT.x86_64 lenovo-confluent confluent_* -y
 [root@oc1 ~]# source /etc/profile.d/xcat.sh
+[root@oc1 ~]# source /etc/profile.d/confluent_env.sh
+
 ```
 verify the installations is ok or not 
 ```
@@ -329,11 +331,62 @@ site table output should look like as
 [root@oc1 ~]# tabdump noderes
 #node,servicenode,netboot,tftpserver,tftpdir,nfsserver,monserver,nfsdir,installnic,primarynic,discoverynics,cmdinterface,xcatmaster,current_osimage,next_osimage,nimserver,routenames,nameservers,proxydhcp,syslog,comments,disable
 "compute",,"xnba",,,"172.20.0.1",,,"mac","mac",,,,,,,,,,,,
+```
+### 16 update the  hosts / ipmi / switch  / switches  Tables to fit the OceanCat Full rack build 
+#### check the node defined groups  with the hosts related inforomation 
+```
 
+[root@oc1 ~]# tabdump hosts | grep -E 'bmcsw|switch|72node|72bmc'
+"72bmcperrack","|\D+(\d+).*$|172.29.(101+(($1-1)/72)).(($1-1)%72+1)|",,,,
+"72nodeperrack","|\D+(\d+).*$|172.20.(101+(($1-1)/72)).(($1-1)%72+1)|",,,,
+"switch","|\D+(\d+).*$|172.30.50.($1+0)|",,,,
+"bmcsw","|\D+(\d+).*$|172.30.50.($1+50)|",,,,
+"bigswitch","|\D+(\d+).*$|172.30.80.($1+0)|",,,,
+
+```
+
+#### set the ipmi tables to chand the suffix from bmc to xcc 
+
+```
+[root@oc1 ~]# chtab node=ipmi ipmi.bmc='|(.*)|($1)-xcc|'
+[root@oc1 ~]# tabdump ipmi
+#node,bmc,bmcport,taggedvlan,bmcid,username,password,comments,disable
+"ipmi","|(.*)|($1)-xcc|",,,,,,,
+
+```
+#### switch community strings settings in SNMPV1 version (default settings)
+```
+[root@oc1 ~]# chtab switch=switch switches.password=RO
+
+[root@oc1 ~]# chtab switch=bmcsw switches.password=RO
+[root@oc1 ~]# tabdump switches
+#switch,snmpversion,username,password,privacy,auth,linkports,sshusername,sshpassword,protocol,switchtype,comments,disable
+"switch",,,"RO",,,,,,,,,
+"bmcsw",,,"RO",,,,,,,,,
+
+```
+##### use the snmpwalk to check the switches work as expected 
+#####  Example: 
+```
+    #get sysDescr.0";
+    my $ccmd = "snmpwalk -Os -v1 -c $community $ip 1.3.6.1.2.1.1.1";
+    #get ipNetToMediaPhysAddress;
+    my $ccmd = "snmpwalk -Os -v1 -c $community $ip 1.3.6.1.2.1.4.22.1.2 | grep $ip";
+    #get sysName info;
+    my $ccmd = "snmpwalk -Os -v1 -c $community $ip 1.3.6.1.2.1.1.5";
 
 
 ```
-### 16 : backup the default tables for future use (/etc/xcat/ is the default location for store the tables)
+#### switch tables 
+
+```
+[root@oc1 ~]# tabdump switch | grep 36
+"36perswitch","|\D+(\d+).*$|switch(($1-1)/36+1)|","|\D+(\d+).*$|(($1-1)%36+1)|",,,,
+"36bmcpersw","|\D+(\d+).*$|bmcsw(($1-1)/36+1)|","|\D+(\d+).*$|(($1-1)%36+1)|",,,,
+
+```
+
+### 17 : backup the default tables for future use (/etc/xcat/ is the default location for store the tables)
 ```
 [root@oc1 ~]# dumpxCATdb -p /root/default_without_node_xCAT_Table
  Creating /root/default_without_node_xCAT_Table for database dump
@@ -352,20 +405,167 @@ firmware.csv       kitrepo.csv       monitoring.csv      nodehm.csv      osdistr
 
 [root@oc1 xcat]# ls
 auditlog.sqlite       eventlog.sqlite      kvm_masterdata.sqlite  networks.sqlite      osdistro.sqlite        ppc.sqlite          taskstate.sqlite
-bootparams.sqlite     firmware.sqlite      kvm_nodedata.sqlite    nics.sqlite          osdistroupdate.sqlite  prescripts.sqlite   token.sqlite
-boottarget.sqlite     hostkeys             linuximage.sqlite      nimimage.sqlite      osimage.sqlite         prodkey.sqlite      virtsd.sqlite
-ca                    hosts.sqlite         litefile.sqlite        nodegroup.sqlite     passwd.sqlite          rack.sqlite         vmmaster.sqlite
-cert                  hwinv.sqlite         litetree.sqlite        nodehm.sqlite        pduoutlet.sqlite       routes.sqlite       vm.sqlite
-cfgmgt.sqlite         hypervisor.sqlite    mac.sqlite             nodelist.sqlite      pdu.sqlite             servicenode.sqlite  vpd.sqlite
-chain.sqlite          ipmi.sqlite          mic.sqlite             nodepos.sqlite       performance.sqlite     site.sqlite         websrv.sqlite
-conf.orig             iscsi.sqlite         monitoring.sqlite      noderes.sqlite       policy.sqlite          statelite.sqlite    winimage.sqlite
-deps.sqlite           kitcomponent.sqlite  monsetting.sqlite      nodetype.sqlite      postscripts.sqlite     storage.sqlite      zone.sqlite
-discoverydata.sqlite  kitrepo.sqlite       mpa.sqlite             notification.sqlite  ppcdirect.sqlite       switches.sqlite     zvm.sqlite
-domain.sqlite         kit.sqlite           mp.sqlite              openbmc.sqlite       ppchcp.sqlite          switch.sqlite
-[root@oc1 xcat]#
+......
+
+---
+
+##  Add OceanCat node , XCC , switches  for testing
+```
+[root@oc1 ~]# nodeadd node01-node72 groups=ipmi,36perswitch,72nodeperrack,compute,all,MFGxxxx,LeROMxxxx
+[root@oc1 ~]# nodeadd node[01-72]-xcc groups=bmc,72bmcperrack,36bmcpersw
+[root@oc1 ~]# nodeadd switch1-switch2 groups=switch
+[root@oc1 ~]# nodeadd bmcsw1-bmcsw2 groups=bmcsw
+
+
+
+```
+###  update hosttables for the node requirement  
+```
+[root@oc1 ~]# tabdump hosts | grep -E '72bmc|72node|switch|bmcsw'
+"72bmcperrack","|\D+(\d+).*$|172.29.(101+(($1-1)/72)).(($1-1)%72+1)|",,,,
+"72nodeperrack","|\D+(\d+).*$|172.20.(101+(($1-1)/72)).(($1-1)%72+1)|",,,,
+"switch","|\D+(\d+).*$|172.30.50.($1+0)|",,,,
+"bmcsw","|\D+(\d+).*$|172.30.50.($1+50)|",,,,
+
+
+[root@oc1 ~]# tabdump switch |grep 36
+"36perswitch","|\D+(\d+).*$|switch(($1-1)/36+1)|","|\D+(\d+).*$|(($1-1)%36+1)|",,,,
+"36bmcpersw","|\D+(\d+).*$|bmcsw(($1-1)/36+1)|","|\D+(\d+).*$|(($1-1)%36+1)|",,,,
+[root@oc1 ~]#
+	
+```
+###  Note :
+#### 36bmcsw is use for zero power on ,and zero power on only support the XCC dedicated mode 
+
+### here is the output for the node ,XCC and Switches       
+
+
+```
+check the node definition ,and check the bmc value ,switch,switchport values
+[root@oc1 ~]# lsdef node01
+Object name: node01
+    arch=x86_64
+    bmc=node01-xcc
+    chain=runcmd=bmcsetup,shell
+    groups=ipmi,36perswitch,72nodeperrack,compute,all,MFGxxxx,LeROMxxxx
+    installnic=mac
+    ip=172.20.101.1
+    mgt=ipmi
+    netboot=xnba
+    nfsserver=172.20.0.1
+    ondiscover=nodediscover
+    os=rhels7.4
+    postbootscripts=otherpkgs
+    postscripts=syslog,remoteshell,syncfiles
+    primarynic=mac
+    profile=compute
+    serialflow=hard
+    serialport=0
+    serialspeed=115200
+    switch=switch1
+    switchport=1
+
+
+check the xcc definitions ,and check the IP,switch,siwtchport values
+
+[root@oc1 ~]# lsdef node01-xcc
+Object name: node01-xcc
+    groups=bmc,72bmcperrack,36bmcpersw
+    ip=172.29.101.1
+    postbootscripts=otherpkgs
+    postscripts=syslog,remoteshell,syncfiles
+    switch=bmcsw1
+    switchport=1
+
+check the switch definitions ,and check the IP values
+
+[root@oc1 ~]# lsdef switch1
+Object name: switch1
+    groups=switch
+    ip=172.30.50.1
+    postbootscripts=otherpkgs
+    postscripts=syslog,remoteshell,syncfiles
+[root@oc1 ~]# lsdef bmcsw1
+Object name: bmcsw1
+    groups=bmcsw
+    ip=172.30.50.51
+    postbootscripts=otherpkgs
+    postscripts=syslog,remoteshell,syncfiles
+[root@oc1 ~]# lsdef bmcsw2
+Object name: bmcsw2
+    groups=bmcsw
+    ip=172.30.50.52
+    postbootscripts=otherpkgs
+    postscripts=syslog,remoteshell,syncfiles
+
+```
+
+---
+### enable the confluent service 
+```
+[root@oc1 ~]# systemctl enable confluent
+Created symlink from /etc/systemd/system/multi-user.target.wants/confluent.service to /usr/lib/systemd/system/confluent.service
+
+[root@oc1 ~]# service confluent start
+Starting confluent (via systemctl):                        [  OK  ]
+
+
+[root@oc1 ~]#  confetty set /nodegroups/everything/attributes/current discovery.policy=open
+discovery.policy="open"
+nodes=[]
+[root@oc1 ~]#  confetty create /nodegroups/switch
+Created: switch
+[root@oc1 ~]# confetty create /nodes/switch1 groups=switch
+Created: switch1
+[root@oc1 ~]#  confetty create /nodes/switch2 groups=switch
+Created: switch2
+[root@oc1 ~]#  confetty create /nodes/bmcsw1 groups=switch
+Created: bmcsw1
+[root@oc1 ~]#  confetty create /nodes/bmcsw2 groups=switch
+Created: bmcsw2
+[root@oc1 ~]# nodelist
+bmcsw1
+bmcsw2
+switch1
+switch2
+
+
+[root@oc1 ~]# makeconfluentcfg all
+[root@oc1 ~]# nodelist
+bmcsw1
+bmcsw2
+node01
+node02
+node03
+node04
+node05
+node06
+...
+
+
+
+
+```
+
+### configure the swithc for SNMP V1 commnunity and IP settings for node discovery ,XCC autoconfigure with IP V6
+
+```
 
 
 ```
 
 
 
+
+
+
+
+
+###
+## Add FPC (Fan Power Controller ) for testing
+
+```
+
+
+
+```
