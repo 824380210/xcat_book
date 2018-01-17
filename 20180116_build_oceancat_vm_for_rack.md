@@ -19,7 +19,7 @@ enabled=1
 gpgcheck=0
 
 ```
-### 3 : boot the system,set hostnamename ,console settings as following
+### 3 : boot the system,set hostname ,console settings as following
 ```
 hostnamectl set-hostname oc1.cluster
 getenforce  ===set to disable
