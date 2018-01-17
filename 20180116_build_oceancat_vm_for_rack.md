@@ -208,6 +208,53 @@ rhels7.4-x86_64-statelite-compute  (osimage)
 [root@oc1 ~]# chtab key=master site.value=oc1
 
 ```
+site table output should look like as
+
+```
+[root@oc1 ~]# tabdump site
+#key,value,comments,disable
+"blademaxp","64",,
+"domain","cluster",,
+"fsptimeout","0",,
+"installdir","/install",,
+"ipmimaxp","64",,
+"ipmiretries","3",,
+"ipmitimeout","2",,
+"consoleondemand","no",,
+"master","oc1",,
+"nameservers","172.20.0.1",,
+"maxssh","8",,
+"ppcmaxp","64",,
+"ppcretry","3",,
+"ppctimeout","0",,
+"powerinterval","0",,
+"syspowerinterval","0",,
+"sharedtftp","1",,
+"SNsyncfiledir","/var/xcat/syncfiles",,
+"nodesyncfiledir","/var/xcat/node/syncfiles",,
+"tftpdir","/tftpboot",,
+"xcatdport","3001",,
+"xcatiport","3002",,
+"xcatconfdir","/etc/xcat",,
+"timezone","US/Eastern",,
+"useNmapfromMN","no",,
+"enableASMI","no",,
+"db2installloc","/mntdb2",,
+"databaseloc","/var/lib",,
+"sshbetweennodes","ALLGROUPS",,
+"dnshandler","ddns",,
+"vsftp","n",,
+"cleanupxcatpost","no",,
+"dhcplease","43200",,
+"auditnosyslog","0",,
+"xcatsslversion","TLSv1",,
+"auditskipcmds","ALL",,
+"dhcpinterfaces","ens8",,
+
+
+```
+#####  check the different output of the site table in preview installation check  and after configure 
+
 ### 12 : xCAT networks Table configure example
 ```
 [root@oc1 ~]# chtab net=172.20.0.0 networks.dynamicrange=172.20.255.1-172.20.255.254 networks.netname="data"
