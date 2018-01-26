@@ -157,8 +157,47 @@ Currently scheduled reboot time: none
 
 
 ```
+### update the update the non-running bank image (standby image) 
+#### same producre 
+```
+LenovoNE10032-001>en
+LenovoNE10032-001#cp tftp tftp://172.30.0.1/NE10032-CNOS-10.6.1.0.imgs system-image all vrf management
+Confirm download operation? (y/n) [n] y
+Download in progress
+.................................................................................................................................................................................
+Copy Success
 
-### 
+Install image...This takes about 90 seconds. Please wait
+Check image signature succeeded
+Extracting image: 100%
+Installing system image to slot 1:
+Installing image: 100%
+Extracting image: 100%
+Installing grub:
+Boot image update not required: Skipping
+Boot image installation succeeded.
+OS image installation succeeded.
+
+Boot loader now contains Software Version 10.6.1.0
+Standby image now contains Software Version 10.6.1.0
+Switch is currently set to boot active image.
+Do you want to change that to the standby image? (y/n) [n] y
+Switch is to be booted with standby image.
+LenovoNE10032-001#save
+Building configuration...
+[OK]
+LenovoNE10032-001#cp running-config startup-config
+Building configuration...
+[OK]
+LenovoNE10032-001#reload
+reboot system? (y/n): y
+2018-01-26T15:30:36+00:00 LenovoNE10032-001(cnos:data) %IMISH-4-REBOOT: The system will be rebooted.
+
+
+```
+
+
+### snmp configure  
 
 ```
 NE10032>enable
