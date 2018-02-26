@@ -175,8 +175,30 @@ exit
 [root@node01 ~]# umount  /install/netboot/rhels7.4/x86_64/myopa74/rootimg/dev
 [root@node01 ~]# umount  /install/netboot/rhels7.4/x86_64/myopa74/rootimg/proc
 [root@node01 ~]# umount  /install/netboot/rhels7.4/x86_64/myopa74/rootimg/sys
+
 ##
 ```
-
+##### 请不要忘子删除在无盘中的IntelOPA-IFS.RHEL74-x86_64.10.6.1.0.2目录再打包 
 ### 13 pack the diskless image and verify in the compute node 
+```
+[root@node01 ~]# cd /install/netboot/rhels7.4/x86_64/myopa74/rootimg/
+[root@node01 rootimg]# mkdir install
+[root@node01 ~]# cd
 
+[root@node01 ~]# packimage myopa74
+Packing contents of /install/netboot/rhels7.4/x86_64/myopa74/rootimg
+archive method:cpio
+compress method:gzip
+
+```
+#### NOTE: Verify with rcons and ssh functions without problem
+
+```
+```
+
+### 15 :优化当前的无盘系统 （集成第三方软件 ，安装其他 常用软件 ，常用脚本等）
+
+```
+
+```
+### 
