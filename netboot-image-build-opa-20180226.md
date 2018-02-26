@@ -28,17 +28,15 @@ e890ffc96d006e89b645d9f939c85718  xcat-core-2.13.10-linux.tar.bz2
 [root@node01 x86_64]# bash mklocalrepo.sh
 [root@node01 x86_64]# yum install xCAT -y
 
-
-
 ```
-### 6 Verify the xCAT installation result 
+### 6: Verify the xCAT installation result 
 ```
 [root@node01 x86_64]# source /etc/profile.d/xcat.sh
 [root@node01 x86_64]# tabdump site
 
-
 ```
-### 7 load the default xCAT tables 
+
+### 7: load the default xCAT tables 
 ```
 
 [root@node01 ~]# cd /opt/xcat/share/xcat/templates/e1350/
@@ -46,13 +44,38 @@ e890ffc96d006e89b645d9f939c85718  xcat-core-2.13.10-linux.tar.bz2
 
 ```
 
-### 8 copycds to build the default osimage 
+### 8: copycds to build the default osimage 
 ```
+
+[root@node01 ~]# ls rhel-server-7.4-x86_64-dvd.iso
+rhel-server-7.4-x86_64-dvd.iso
+[root@node01 ~]# copycds rhel-server-7.4-x86_64-dvd.iso
+Copying media to /install/rhels7.4/x86_64
+Media copy operation successful
+[root@node01 ~]#
+
+[root@node01 ~]# lsdef -t osimage
+rhels7.4-x86_64-install-compute  (osimage)
+rhels7.4-x86_64-install-service  (osimage)
+rhels7.4-x86_64-netboot-compute  (osimage)
+rhels7.4-x86_64-stateful-mgmtnode  (osimage)
+rhels7.4-x86_64-statelite-compute  (osimage)
 
 
 ```
-###
  
-###  create the custom osimage 
+### 9: create the custom osimage
+```
+[root@node01 ~]# lsdef -t osimage -z rhels7.4-x86_64-netboot-compute | sed  's/^[^ ]\+:/myopa74:/' |mkdef -z
+1 object definitions have been created or modified.
+[root@node01 ~]# chdef  -t osimage myopa74 pkglist=/opt/xcat/share/xcat/netboot/rh/compute.rhels7.x86_64.myopa74.pkglist
 
+[root@node01 ~]# chdef -t osimage myopa74 pkglist=/opt/xcat/share/xcat/netboot/rh/compute.rhels7.x86_64.myopa74.pkglist
+1 object definitions have been created or modified.
+[root@node01 ~]# chdef -t osimage myopa74 rootimgdir=/install/netboot/rhels7.4/x86_64/myopa74
+1 object definitions have been created or modified.
+[root@node01 ~]# mkdir -p /install/netboot/rhels7.4/x86_64/myopa74
+
+``` 
+#### [compute.rhels7.x86_64.myopa74.pkglist](https://github.com/824380210/xcat_book/blob/master/compute.rhels7.x86_64.myopa74.pkglist)
 ###  build the custom osimage with special settings 
