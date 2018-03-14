@@ -214,9 +214,10 @@ config file version: HFI_TYPE1 v1.0.1.0
 ```
 [root@mgt33 ~]# md5sum step1.asu step2.asu
 bec97fb914bd8822199939a045ff6d8d  step1.asu
-23b491109259ee5f5eca2f31561a89d0  step2.asu
+73bec0ae708caf530d42407d71ab3947  step2.asu
+
 ```
-# setp 2好象不支持TDP设置，现在需要手动设置(在完成step 2后)
+# setp 2不支持TDP设置，现在需要手动设置(在完成step 2后)
 ```
 [root@mgt33 ~]# pasu i01r05c04s[11-12] set Processors.TDP 240 --override
 i01r05c04s12: Processors.TDP=240
@@ -227,8 +228,100 @@ i01r05c04s12: Command completed successfully.
 i01r05c04s11: Command completed successfully.
 
 ```
+# 在跑压力测试之前，要对系统做一个健康检查 ，确保所有节点设置一致
+# 检查脚本在python_tools/LRZ/目录下，执行之前先同步一下
+```
+[root@mgt33 ~]# md5sum python_tools/LRZ/sys-health-check /install/johnw/sys-health-check
+c410fcacd669ca6b798135d79f40c2d8  python_tools/LRZ/sys-health-check
+c410fcacd669ca6b798135d79f40c2d8  /install/johnw/sys-health-check
 
+[root@mgt33 ~]# /install/johnw/sys-health-check all | tee /tmp/health-check-201803142357.log
+====================================
+compute
+====================================
+                                Expected                                  Actual  Status        Description
+                             -----------                                  ------  ------        -----------
+                                    1.50                                    1.50      OK        Node XCC Firmware Version
+                                 OTE106I                                 OTE106I      OK        Node UEFI Firmware Version
+                                 VT-UTF8                                 VT-UTF8      OK        DevicesandIOPorts.Com1TerminalEmulation
+                                  Enable                                  Enable      OK        DevicesandIOPorts.Com1ActiveAfterBoot
+                                Hardware                                Hardware      OK        DevicesandIOPorts.Com1FlowControl
+                             Cooperative                             Cooperative      OK        Processors.CPUPstateControl
+                                 Disable                                 Disable      OK        Processors.SNC
+                                    UEFI                                    UEFI      OK        EnableDisableAdapterOptionROMSupport.OnboardVideo
+                                    None                                    None      OK        DiskGPTRecovery.DiskGPTRecovery
+                             Custom Mode                             Custom Mode      OK        OperatingModes.ChooseOperatingMode
+                                    240W                                    240W      OK        Processor Power
+                              3.10.0-693                              3.10.0-693      OK        Linux Kernel Version
+                            96@powersave                            96@powersave      OK        CPU scaling_govenor
+                              96@1200000                              96@1200000      OK        CPU scaling_min_freq
+                              96@3900000                              96@3900000      OK        CPU scaling_max_freq
+                                    94GB                                    94GB      OK        MEMORY Total
+                  [always] madvise never                  [always] madvise never      OK        MEMORY Huge Transparent Pages
+                                       1                                       1      OK        OPA Ports visible to Operating System
+                                (rev 11)                                (rev 11)      OK        OPA Card Level(s)
+                                     x16                                     x16      OK        OPA PCI Lanes
+                              10.6.1.0.2                              10.6.1.0.2      OK        OPA Driver Version
+                                  Active                                  Active      OK        OPA Link Status
+                                       4                                       4      OK        OPA Tx LaneWidth
+                                       4                                       4      OK        OPA Rx LaneWidth
+                           5 (Excellent)                           5 (Excellent)      OK        OPA Link Quality
+                                datagram                                datagram      OK        OPA mode
+                                    4092                                    4092      OK        OPA MTU
+                                     128                                     128      OK        OPA Send Queue Size
+                                     256                                     256      OK        OPA Receive Queue Size
+                                v1.0.1.0                                v1.0.1.0      OK        OPA Adapter Config Version
+                               1.6.0.0.0                               1.6.0.0.0      OK        OPA Adapter Loader Version
+                               1.6.0.0.0                               1.6.0.0.0      OK        OPA Adapter Config Version
+                            10.4.0.0.146                            10.4.0.0.146      OK        OPA Adapter TMM Version
 
+[root@mgt33 ~]#
+ 
+```
+
+[root@mgt33 ~]# /install/johnw/sys-health-check all | tee /tmp/health-check-201803142357.log
+====================================
+compute
+====================================
+                                Expected                                  Actual  Status        Description
+                             -----------                                  ------  ------        -----------
+                                    1.50                                    1.50      OK        Node XCC Firmware Version
+                                 OTE106I                                 OTE106I      OK        Node UEFI Firmware Version
+                                 VT-UTF8                                 VT-UTF8      OK        DevicesandIOPorts.Com1TerminalEmulation
+                                  Enable                                  Enable      OK        DevicesandIOPorts.Com1ActiveAfterBoot
+                                Hardware                                Hardware      OK        DevicesandIOPorts.Com1FlowControl
+                             Cooperative                             Cooperative      OK        Processors.CPUPstateControl
+                                 Disable                                 Disable      OK        Processors.SNC
+                                    UEFI                                    UEFI      OK        EnableDisableAdapterOptionROMSupport.OnboardVideo
+                                    None                                    None      OK        DiskGPTRecovery.DiskGPTRecovery
+                             Custom Mode                             Custom Mode      OK        OperatingModes.ChooseOperatingMode
+                                    240W                                    240W      OK        Processor Power
+                              3.10.0-693                              3.10.0-693      OK        Linux Kernel Version
+                            96@powersave                            96@powersave      OK        CPU scaling_govenor
+                              96@1200000                              96@1200000      OK        CPU scaling_min_freq
+                              96@3900000                              96@3900000      OK        CPU scaling_max_freq
+                                    94GB                                    94GB      OK        MEMORY Total
+                  [always] madvise never                  [always] madvise never      OK        MEMORY Huge Transparent Pages
+                                       1                                       1      OK        OPA Ports visible to Operating System
+                                (rev 11)                                (rev 11)      OK        OPA Card Level(s)
+                                     x16                                     x16      OK        OPA PCI Lanes
+                              10.6.1.0.2                              10.6.1.0.2      OK        OPA Driver Version
+                                  Active                                  Active      OK        OPA Link Status
+                                       4                                       4      OK        OPA Tx LaneWidth
+                                       4                                       4      OK        OPA Rx LaneWidth
+                           5 (Excellent)                           5 (Excellent)      OK        OPA Link Quality
+                                datagram                                datagram      OK        OPA mode
+                                    4092                                    4092      OK        OPA MTU
+                                     128                                     128      OK        OPA Send Queue Size
+                                     256                                     256      OK        OPA Receive Queue Size
+                                v1.0.1.0                                v1.0.1.0      OK        OPA Adapter Config Version
+                               1.6.0.0.0                               1.6.0.0.0      OK        OPA Adapter Loader Version
+                               1.6.0.0.0                               1.6.0.0.0      OK        OPA Adapter Config Version
+                            10.4.0.0.146                            10.4.0.0.146      OK        OPA Adapter TMM Version
+
+[root@mgt33 ~]#
+
+```
 # 跑单机测试(可选)
 
 ```
@@ -326,10 +419,35 @@ i01r05c01s01: done
 [root@i01r05c01s01 cluster]#bash 36node.sh
 
 ```
-
+# 36个节点压力测试只能一组跑，chiller功率不足，不支持两组同时跑 
 power cycle测试
 数据收集
 
+# 添加特别版本xhpl测试
+# xhpl程序由intel特别提供，用于捕捉更多信息
+# 程序放在python_tools/HPL目录下面
+##  执行36个节点单机测试如下
+```
 
+[root@mgt33 ~]# ls HPL
+HPL.dat  parse.sh  run.sh  single_run.sh  skl3_HPL_2018-03-12_17-23  xhpl
+[root@mgt33 ~]# scp -r HPL  python_tools/
+[root@mgt33 ~]# cat HPL/single_run.sh
+#!/bin/bash
+hostname=`hostname -s`
+fmt=`date +%Y%m%d%H%M%S`
+./xhpl | tee /install/mgt33/single_hpl/single_${hostname}_${fmt}.log
+
+[root@mgt33 ~]# pscp -r HPL all:/root/
+
+[root@mgt33 ~]# psh all mount mgt33:/install /install
+[root@mgt33 ~]# ls /install/mgt33/single_hpl/
+
+[root@mgt33 ~]# psh i01r05c0[1-3]s[01-12] "cd /root/HPL; bash single_run.sh"
+
+```
+## 可以监控/install/mgt33/single_hpl/下的文件，正常情况下单节点linpack可以在5分钟内跑完呵！
+
+## 分两组跑单机的压力测试，测试完一组后才能跑另一组（因chiller功率不足导致）
 
 
