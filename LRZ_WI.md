@@ -430,4 +430,58 @@ fmt=`date +%Y%m%d%H%M%S`
 ## 2： 生成hostfile文件，并同步到相应的节点中去
 ## 3： 生成测试的脚本
 ## 4： 同步HPL.dat到各个节点去（注意HPL.dat.36node 与 HPL.dat.36n的区别）
-## 5:  同步指定的xhpl 到所有节点的/root/peter/cluster目录
+
+
+```
+ 1108  pscp xhpl all:/root/peter/cluster/
+
+
+
+ 1097  pscp HPL.dat.36n all:/root/peter/cluster/
+ 1098  nodelist i01r05c[01-03]s[01-12]
+ 1099  nodelist i01r05c[01-03]s[01-12] >hostfile
+ 1100  pscp hostfile  i01r05c[01-03]s[01-12]:/root/peter/cluster/
+ 1101  nodelist i01r05c[04-06]s[01-12] >hostfile
+ 1102  pscp hostfile  i01r05c[04-06]s[01-12]:/root/peter/cluster/
+
+
+[root@mgt33 cluster]# pscp HPL.dat.36n all:/root/peter/cluster/HPL.dat
+
+
+
+
+[root@i01r05c01s01 cluster]# cat n36.sh
+#!/bin/bash
+source ./tools_cluster.sh
+# . /root/peter/cluster/tools_cluster.sh
+fm=`date +%Y%m%d%H%M`
+echo -e " make sure all OPA port is up and running "
+#echo -e "ln -s /usr/lib/systemd/system/opafm.service /etc/systemd/system/multi-user.target.wants/opafm.service"
+# systemctl restart opafm.service
+# opainfo
+# opafabricinfo
+#
+mkdir -p /install/tmp/
+echo -e "Test log is store in the /install/tmp/linpack_${fm}.log"
+echo -e "\n\n***********************************************************************************************\n"
+mpirun -genvall -f hostfile -np 36 -ppn 1 /root/peter/cluster/xhpl | tee /install/mgt33/36node-linpack_${fm}.log
+#
+echo -e "***********************************************************************************************"
+echo -e "\n\n\nTest log is store in the /install/tmp/linpack_${fm}.log\n\n\n"
+#
+#
+[root@i01r05c01s01 cluster]#
+
+
+[root@i01r05c01s01 cluster]# pwd
+/root/peter/cluster
+[root@i01r05c01s01 cluster]#  bash n36.sh
+
+
+[root@mgt33 HPL]# ssh i01r05c04s12
+[root@i01r05c04s12 ~]# cd peter/cluster/
+[root@i01r05c04s12 cluster]# cat hostfile
+[root@i01r05c04s12 cluster]#bash n36.sh
+
+
+```
