@@ -346,7 +346,7 @@ compute
 ```
 生成hostfile 
 复制到指定节点的:/root/peter/cluster下面
-将/root/peter/HPL.dat.xn复制到跑linpack节点的:/root/peter/cluster/HPL.dat
+将/root/peter/HPL.dat.xn(注意：HPL.dat.36node是给768G FAT NODE用的，96G的Thin node 要用HPL.dat.36n)复制到跑linpack节点的:/root/peter/cluster/HPL.dat
 进入某节点/root/peter/cluster/下跑对应的脚本，如bash 36node.sh
 
 
@@ -425,4 +425,9 @@ fmt=`date +%Y%m%d%H%M%S`
 
 
 ```
-
+# 跑 36个节点的组压力测试
+## 1： 同步HPL目录的xhpl到所有节点的/root/peter/cluster目录去
+## 2： 生成hostfile文件，并同步到相应的节点中去
+## 3： 生成测试的脚本
+## 4： 同步HPL.dat到各个节点去（注意HPL.dat.36node 与 HPL.dat.36n的区别）
+## 5:  同步指定的xhpl 到所有节点的/root/peter/cluster目录
