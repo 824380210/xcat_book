@@ -407,4 +407,22 @@ fmt=`date +%Y%m%d%H%M%S`
 
 ## 分两组跑单机的压力测试，测试完一组后才能跑另一组（因chiller功率不足导致）
 
+```
+[root@mgt33 ~]# grep WR /install/mgt33/single_hpl/single_i01r05c0* |sort -k7 -n
+/install/mgt33/single_hpl/single_i01r05c01s12_20180314202740.log:WR00L2L4      103296   384     1     1             260.48            2.82091e+03
+/install/mgt33/single_hpl/single_i01r05c02s10_20180314202744.log:WR00L2L4      103296   384     1     1             253.41            2.89959e+03
+/install/mgt33/single_hpl/single_i01r05c03s04_20180314202738.log:WR00L2L4      103296   384     1     1             248.33            2.95899e+03
+/install/mgt33/single_hpl/single_i01r05c03s11_20180314202742.log:WR00L2L4      103296   384     1     1             248.15            2.96114e+03
+/install/mgt33/single_hpl/single_i01r05c02s02_20180314202742.log:WR00L2L4      103296   384     1     1             246.98            2.97517e+03
+/install/mgt33/single_hpl/single_i01r05c01s08_20180314202742.log:WR00L2L4      103296   384     1     1             246.49            2.98107e+03
+/install/mgt33/single_hpl/single_i01r05c01s10_20180314202742.log:WR00L2L4      103296   384     1     1             245.63            2.99146e+03
+/install/mgt33/single_hpl/single_i01r05c01s09_20180314202742.log:WR00L2L4      103296   384     1     1             242.60            3.02889e+03
+/install/mgt33/single_hpl/single_i01r05c03s12_20180314202743.log:WR00L2L4      103296   384     1     1             242.56            3.02937e+03
+/install/mgt33/single_hpl/single_i01r05c01s04_20180314202743.log:WR00L2L4      103296   384     1     1             240.56            3.05459e+03
+/install/mgt33/single_hpl/single_i01r05c02s05_20180314202741.log:WR00L2L4      103296   384     1     1             239.26            3.07110e+03
+/install/mgt33/single_hpl/single_i01r05c02s11_20180314202741.log:WR00L2L4      103296   384     1     1             234.09            3.13903e+03
+/install/mgt33/single_hpl/single_i01r05c03s02_20180314202743.log:WR00L2L4      103296   384     1     1             233.00            3.15364e+03
+
+
+```
 
