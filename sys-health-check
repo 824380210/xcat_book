@@ -1,0 +1,310 @@
+#!/bin/bash
+
+FORMAT='%40s%40s%8s\t%s\n'
+HEADER=$(printf ${FORMAT} "Expected" "Actual" "Status" "Description")
+LINE=$(printf ${FORMAT}   "-----------" "------" "------" "-----------")
+
+get_status()
+{
+   if [ "$1" == "N/A" ]
+   then
+      echo "N/A"
+      return
+   fi
+
+   if [ "$1" == "$2" ]
+   then
+      echo "OK"
+   else
+      echo "BAD"
+   fi
+}
+
+print_status()
+{
+   STATUS=$(get_status "${EXPECTED}" "${ACTUAL}")
+
+   printf ${FORMAT} "${EXPECTED}" "${ACTUAL}" "${STATUS}" "$1"
+
+   STATUS=""
+}
+
+#########################################
+#MAIN BODY
+########################################
+
+cd $(dirname $0)
+PROGDIR=$(pwd)
+PROGNAME=$(basename $0)
+
+GROUP="compute"
+if [ -n "$1" ]
+then
+        GROUP=$1
+fi
+
+# Only run script, from xCAT Management Server
+hostname -s | grep -e "mgt33" >/dev/null 2>&1
+
+if [ $? -eq 0 ]
+then
+   # Construct a list of nodes that are not contactable
+   DELIM=""
+   for bad in $(pping ${GROUP} | sort | grep noping | awk -F: '{print $1}')
+   do
+      BADNODES=${BADNODES}$(printf "%s%s" "${DELIM}" ${bad})
+      DELIM=","
+   done
+
+   if [ -n "${BADNODES}" ]
+   then
+      echo "---------------------------------------------------------------------"
+      printf "WARNING: Following nodes were not contactable, so excluded from check:\n\t%s\n" ${BADNODES}
+      echo "---------------------------------------------------------------------"
+      BADLIST=$(echo ${BADNODES} | sed -e 's/^/-/' -e 's/,/,-/g')
+      NODELIST=${GROUP}","${BADLIST}
+   else
+      NODELIST=${GROUP}
+   fi
+
+   # Copy script to service nodes, to ensure they can copy script to compute nodes
+   xdcp ${NODELIST} ${PROGDIR}/${PROGNAME} /tmp
+   xdsh ${NODELIST} sh /tmp/${PROGNAME} | xcoll
+   exit 0
+fi
+#
+# Determine Node type from hostname
+#
+NODE=$(hostname -s)
+
+echo "${HEADER}"
+echo "${LINE}"
+
+#
+# XCC Firmware
+#
+EXPECTED="1.50"
+ACTUAL=$(ipmitool bmc info -U root | grep "Firmware Revision" | awk '{print $4}')
+print_status "Node XCC Firmware Version"
+#
+# UEFI Firmware
+#
+EXPECTED="OTE106I"
+ACTUAL=$(dmidecode -t BIOS|grep Version | cut -c13-19)
+print_status "Node UEFI Firmware Version"
+#
+# UEFI settings
+#
+ONECLI="/root/onecli/OneCli"
+if [[ -x ${ONECLI} ]]
+then
+   foo=( $(${ONECLI} config show | egrep "OperatingModes.ChooseOperatingMode|Processors.CPUPstateControl|Processors.SNC|DevicesandIOPorts.Com1TerminalEmulation|DevicesandIOPorts.Com1ActiveAfterBoot|DevicesandIOPorts.Com1FlowControl|DiskGPTRecovery.DiskGPTRecovery|EnableDisableAdapterOptionROMSupport.OnboardVideo") )
+   EXPECTED="VT-UTF8"
+   ACTUAL=${foo[0]##*=}
+   print_status "DevicesandIOPorts.Com1TerminalEmulation"
+
+   EXPECTED="Enable"
+   ACTUAL=${foo[1]##*=}
+   print_status "DevicesandIOPorts.Com1ActiveAfterBoot"
+
+   EXPECTED="Hardware"
+   ACTUAL=${foo[2]##*=}
+   print_status "DevicesandIOPorts.Com1FlowControl"
+
+   EXPECTED="Cooperative"
+   ACTUAL=${foo[3]##*=}
+   print_status "Processors.CPUPstateControl"
+
+   EXPECTED="Disable"
+   ACTUAL=${foo[4]##*=}
+   print_status "Processors.SNC"
+
+   EXPECTED="UEFI"
+   ACTUAL=${foo[5]##*=}
+   print_status "EnableDisableAdapterOptionROMSupport.OnboardVideo"
+
+   EXPECTED="None"
+   ACTUAL=${foo[6]##*=}
+   print_status "DiskGPTRecovery.DiskGPTRecovery"
+
+   EXPECTED="Custom Mode"
+   ACTUAL="${foo[7]##*=} ${foo[8]}"
+   print_status "OperatingModes.ChooseOperatingMode"
+fi
+
+EXPECTED="240W"
+ACTUAL=$(${ONECLI} config show Processors.TDP --override | grep Processors.TDP | awk -F= '{printf ("%.3dW",$2)}')
+print_status "Processor Power"
+
+# Kernel version
+#
+EXPECTED="3.10.0-693.17.1"
+EXPECTED="3.10.0-693"
+ACTUAL=$(uname -r | sed -e 's/.el7.x86_64$//')
+print_status "Linux Kernel Version"
+#
+# Boot options
+#
+#EXPECTED="console=ttyS0,115200"
+#ACTUAL=$(cat /proc/cmdline | awk '{print $7}')
+#print_status "Linux Kernel Boot Options 1"
+#
+#EXPECTED="processor.ignore_ppc=1"
+#ACTUAL=$(cat /proc/cmdline | awk '{print $8}')
+#print_status "Linux Kernel Boot Options 2"
+#
+#EXPECTED="intel_pstate=disable"
+#ACTUAL=$(cat /proc/cmdline | awk '{print $9}')
+#print_status "Linux Kernel Boot Options 2"
+#
+#EXPECTED="nosmap"
+#ACTUAL=$(cat /proc/cmdline | awk '{print $10}')
+#print_status "Linux Kernel Boot Options 3"
+#
+#EXPECTED="swapaccount=1"
+#ACTUAL=$(cat /proc/cmdline | awk '{print $11}')
+#print_status "Linux Kernel Boot Options 4"
+
+#EXPECTED="36x2300MHz"
+#ACTUAL=$(cat /proc/cpuinfo | grep MHz | awk '{ printf ("%.0f\n", $4) }' | sort -n | uniq -c | sort -n -k2 | head -1 | awk '{ printf ("%dx%dMHz",$1,$2) }')
+#print_status "CPU Current Core Frequencies (only minimum frequency shown)"
+#
+# Frequency Governor and core count
+#
+EXPECTED="96@powersave"
+ACTUAL=$(cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor | sort | uniq -c | awk '{ printf ("%d@%s,",$1,$2) }' | sed 's/,$//')
+print_status "CPU scaling_govenor"
+
+EXPECTED="96@1200000"
+ACTUAL=$(cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_min_freq | sort | uniq -c | awk '{ printf ("%d@%s,",$1,$2) }' | sed 's/,$//')
+print_status "CPU scaling_min_freq"
+
+EXPECTED="96@3900000"
+ACTUAL=$(cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq | sort | uniq -c | awk '{ printf ("%d@%s,",$1,$2) }' | sed 's/,$//')
+print_status "CPU scaling_max_freq"
+
+EXPECTED="94GB"
+ACTUAL=$(cat /proc/meminfo | grep MemTotal: | awk '{ printf ("%i%s\n", $2/1024/1024,"GB") }')
+print_status "MEMORY Total"
+
+EXPECTED="[always] madvise never"
+ACTUAL=$(cat /sys/kernel/mm/transparent_hugepage/enabled)
+print_status "MEMORY Huge Transparent Pages"
+
+# Check OPA setting in nodes with OPA cards
+EXPECTED=1
+ACTUAL=$(lspci | grep -i hfi | wc -l)
+print_status "OPA Ports visible to Operating System"
+
+OPA_CARD=${ACTUAL}
+
+EXPECTED="(rev 11)"
+if [ ${OPA_CARD} -ne 0 ] ; then ACTUAL=$(lspci | grep HFI | awk -F\( '{printf ("(%s:", $2)}' | sed -e 's/:$//') ; else ACTUAL="Unknown" ; fi
+print_status "OPA Card Level(s)"
+
+EXPECTED="x16"
+ACTUAL=$(lspci -s 58:00.0 -vvv | grep LnkSta: | awk '{print $5}' | sed 's/,//')
+print_status "OPA PCI Lanes"
+
+ACTUAL=$(opaconfig -V)
+#EXPECTED="10.6.0.0.134"
+EXPECTED="10.6.1.0.2"
+print_status "OPA Driver Version"
+
+EXPECTED="Active"
+if [ ${OPA_CARD} -ne 0 ] ; then ACTUAL=$(opainfo 2> /dev/null| grep -e PortState: -e PhysicalState: | awk '{printf ("%s:", $2)}' | sed -e 's/:$//') ; else ACTUAL="Unknown" ; fi
+print_status "OPA Link Status"
+
+EXPECTED="4"
+if [ ${OPA_CARD} -ne 0 ] ; then ACTUAL=$(opainfo 2> /dev/null| grep LinkWidthDnGrd | awk '{printf ("%s:", $3)}' | sed -e 's/:$//') ; else ACTUAL="Unknown" ; fi
+   print_status "OPA Tx LaneWidth"
+
+EXPECTED="4"
+if [ ${OPA_CARD} -ne 0 ] ; then ACTUAL=$(opainfo 2> /dev/null| grep LinkWidthDnGrd | awk '{printf ("%s:", $5)}' | sed -e 's/:$//') ; else ACTUAL="Unknown" ; fi
+print_status "OPA Rx LaneWidth"
+
+EXPECTED="5 (Excellent)"
+if [ ${OPA_CARD} -ne 0 ] ; then ACTUAL=$(opainfo 2> /dev/null| grep "Link Quality:" | awk '{ printf ("%s %s:",$3,$4) }' | sed -e 's/:$//') ; else ACTUAL="Unknown" ; fi
+print_status "OPA Link Quality"
+
+EXPECTED="datagram"
+ACTUAL=$(cat /sys/class/net/ib0/mode 2> /dev/null)
+print_status "OPA mode"
+
+EXPECTED="4092"
+ACTUAL=$(cat /sys/class/net/ib0/mtu 2> /dev/null)
+print_status "OPA MTU"
+
+EXPECTED="128"
+ACTUAL=$(cat /sys/module/ib_ipoib/parameters/send_queue_size 2> /dev/null)
+print_status "OPA Send Queue Size"
+
+EXPECTED="256"
+ACTUAL=$(cat /sys/module/ib_ipoib/parameters/recv_queue_size 2> /dev/null)
+print_status "OPA Receive Queue Size"
+
+HFI=/usr/bin/hfi1_eprom
+OPATMM=/usr/sbin/opatmmtool
+
+EXPECTED="v1.0.1.0"
+ACTUAL="$($HFI -V -c | tail -1 | awk '{ print $8}')"
+print_status "OPA Adapter Config Version"
+
+EXPECTED="1.6.0.0.0"
+ACTUAL="$($HFI -V -o | tail -1 | cut -d ' ' -f 8)"
+print_status "OPA Adapter Loader Version"
+
+EXPECTED="1.6.0.0.0"
+ACTUAL="$($HFI -V -b | tail -1 | cut -d ' ' -f 8)"
+print_status "OPA Adapter Config Version"
+
+EXPECTED="10.4.0.0.146"
+ACTUAL="$($OPATMM fwversion | cut -d '=' -f 2)"
+print_status "OPA Adapter TMM Version"
+
+#EXPECTED="8192"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/default/gc_thresh3)
+#print_status "ARP default gc_thresh3 (CINECA 65536)"
+#
+#EXPECTED="4096"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/default/gc_thresh2)
+#print_status "ARP default gc_thresh2 (CINECA 65536)"
+#
+#EXPECTED="1024"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/default/gc_thresh1)
+#print_status "ARP default gc_thresh1 (CINECA 32768)"
+#
+#EXPECTED="-1"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/default/gc_stale_time)
+#print_status "ARP default gc_stale_time (CINECA 1000000)"
+#
+#EXPECTED="-1"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/ib0/gc_stale_time 2> /dev/null)
+#print_status "ARP ib0 gc_stale_time (CINECA 1000000)"
+#
+#EXPECTED="30"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/default/gc_interval)
+#print_status "ARP default gc_stale_interval (CINECA 2000000)"
+#
+#EXPECTED="2147483"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/default/base_reachable_time)
+#print_status "ARP default base_reachable_time (CINECA 30)"
+#
+#EXPECTED="2147483647"
+#ACTUAL=$(cat /proc/sys/net/ipv4/neigh/default/base_reachable_time_ms)
+#print_status "ARP default base_reachable_time_ms (CINECA 30000)"
+#
+## Query TCP memory buffers
+#EXPECTED="16777216,16777216,16777216"
+#ACTUAL=$(cat /proc/sys/net/ipv4/tcp_mem | awk '{printf ("%s,%s,%s",$1,$2,$2)}')
+#print_status "TCP tcp_mem"
+#
+#EXPECTED="4096,87380,87380"
+#ACTUAL=$(cat /proc/sys/net/ipv4/tcp_rmem | awk '{printf ("%s,%s,%s",$1,$2,$2)}')
+#print_status "TCP tcp_rmem"
+#
+#EXPECTED="4096,65536,65536"
+#ACTUAL=$(cat /proc/sys/net/ipv4/tcp_wmem | awk '{printf ("%s,%s,%s",$1,$2,$2)}')
+#print_status "TCP tcp_wmem"
+#
+exit 0
