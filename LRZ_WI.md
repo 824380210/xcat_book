@@ -235,49 +235,6 @@ i01r05c04s11: Command completed successfully.
 c410fcacd669ca6b798135d79f40c2d8  python_tools/LRZ/sys-health-check
 c410fcacd669ca6b798135d79f40c2d8  /install/johnw/sys-health-check
 
-[root@mgt33 ~]# /install/johnw/sys-health-check all | tee /tmp/health-check-201803142357.log
-====================================
-compute
-====================================
-                                Expected                                  Actual  Status        Description
-                             -----------                                  ------  ------        -----------
-                                    1.50                                    1.50      OK        Node XCC Firmware Version
-                                 OTE106I                                 OTE106I      OK        Node UEFI Firmware Version
-                                 VT-UTF8                                 VT-UTF8      OK        DevicesandIOPorts.Com1TerminalEmulation
-                                  Enable                                  Enable      OK        DevicesandIOPorts.Com1ActiveAfterBoot
-                                Hardware                                Hardware      OK        DevicesandIOPorts.Com1FlowControl
-                             Cooperative                             Cooperative      OK        Processors.CPUPstateControl
-                                 Disable                                 Disable      OK        Processors.SNC
-                                    UEFI                                    UEFI      OK        EnableDisableAdapterOptionROMSupport.OnboardVideo
-                                    None                                    None      OK        DiskGPTRecovery.DiskGPTRecovery
-                             Custom Mode                             Custom Mode      OK        OperatingModes.ChooseOperatingMode
-                                    240W                                    240W      OK        Processor Power
-                              3.10.0-693                              3.10.0-693      OK        Linux Kernel Version
-                            96@powersave                            96@powersave      OK        CPU scaling_govenor
-                              96@1200000                              96@1200000      OK        CPU scaling_min_freq
-                              96@3900000                              96@3900000      OK        CPU scaling_max_freq
-                                    94GB                                    94GB      OK        MEMORY Total
-                  [always] madvise never                  [always] madvise never      OK        MEMORY Huge Transparent Pages
-                                       1                                       1      OK        OPA Ports visible to Operating System
-                                (rev 11)                                (rev 11)      OK        OPA Card Level(s)
-                                     x16                                     x16      OK        OPA PCI Lanes
-                              10.6.1.0.2                              10.6.1.0.2      OK        OPA Driver Version
-                                  Active                                  Active      OK        OPA Link Status
-                                       4                                       4      OK        OPA Tx LaneWidth
-                                       4                                       4      OK        OPA Rx LaneWidth
-                           5 (Excellent)                           5 (Excellent)      OK        OPA Link Quality
-                                datagram                                datagram      OK        OPA mode
-                                    4092                                    4092      OK        OPA MTU
-                                     128                                     128      OK        OPA Send Queue Size
-                                     256                                     256      OK        OPA Receive Queue Size
-                                v1.0.1.0                                v1.0.1.0      OK        OPA Adapter Config Version
-                               1.6.0.0.0                               1.6.0.0.0      OK        OPA Adapter Loader Version
-                               1.6.0.0.0                               1.6.0.0.0      OK        OPA Adapter Config Version
-                            10.4.0.0.146                            10.4.0.0.146      OK        OPA Adapter TMM Version
-
-[root@mgt33 ~]#
- 
-```
 
 [root@mgt33 ~]# /install/johnw/sys-health-check all | tee /tmp/health-check-201803142357.log
 ====================================
