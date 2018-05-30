@@ -1,4 +1,4 @@
-# NVME RAID CARD SETTINGS
+# M.2 driver  SETTINGS
 
 ## introduce by LeROM LeROM201700655
 ### Basic INFO for the systems
@@ -42,7 +42,26 @@ AUNC	ThinkSystem 16GB TruDDR4 2666 MHz (2Rx8 1.2V) RDIMM
 ......
 
 ```
+### other Part that have same issue 
+```
+Part number information
 
+The following table lists the ThinkSystem part numbers.
+Table 1. M.2 components Part
+number 	Feature
+code 	Description 	Maximum
+Supported
+M.2 adapters
+7Y37A01092 	AUMU 	ThinkSystem M.2 Enablement Kit
+(contains the Single M.2 Adapter; supports 1 drive) 	1
+7Y37A01093 	AUMV 	ThinkSystem M.2 with Mirroring Enablement Kit
+(contains the Dual M.2 Adapter, supports 1 or 2 drives) 	1
+M.2 drives
+7N47A00129 	AUUL 	ThinkSystem M.2 CV1 32GB SATA 6Gbps Non-Hot-Swap SSD 	1 / 2*
+7N47A00130 	AUUV 	ThinkSystem M.2 CV3 128GB SATA 6Gbps Non-Hot-Swap SSD 	1 / 2*
+7SD7A05703 	B11V 	ThinkSystem M.2 5100 480GB SATA 6Gbps Non-Hot-Swap SSD 	1 / 2*
+
+```
 
 ### check the tools MD5
 
