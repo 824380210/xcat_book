@@ -107,7 +107,7 @@ Total # of VD:       1
 ```
 ## create RAID (not verify yet )
 ```
-   /opt/marvell/storage/cli/mvcli smart -p 0  create -o vd -r1 -n "MyVirtualDisk" -d 0,1
+   /opt/marvell/storage/cli/mvcli  create -o vd -r1 -n "MyVirtualDisk" -d 0,1
 
 ```
 ### read the driver informations 
