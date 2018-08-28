@@ -31,6 +31,7 @@ node05: off
 ```
 ##  2: wait 1 minutes ,disconnect the PDU by turn off the switch for whole rack ( AC off )
 ##
+![rack topology](https://github.com/824380210/xcat_book/blob/master/power_cycle_test.png?raw=true)
 ##  3: wait for 3-5 minutes ,turn on the switch to PDU (AC on ) for whole rack 
 ##
 ##  4: wait the smm and XCC is up and running 
