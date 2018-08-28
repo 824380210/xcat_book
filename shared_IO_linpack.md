@@ -123,15 +123,21 @@ echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
  chdef  noderange  addkcmdline="hugepagesz=1G hugepages=360 default_hugepagesz=1G" 
  nodeset all osimage=edr741
  rsetboot all net -u
- rpower all on 
+ rpower all reset
 
 ```
-## 13：	you should use the special xhpl version (scinet version xhpl in /root/peter/cluster ) with hugepage linpack run 
-## 14: disabe the hugepage settings 
+## 13:	setup the hugepage related settings after node is up and running 
+```
+psh c1  hugeadm --create-global-mounts --set-recommended-shmmax
+psh c1  cpupower frequency-set -g performance
+
+```
+## 14:	you should use the special xhpl version (scinet version xhpl in /root/peter/cluster ) with hugepage linpack run 
+## 15:  disabe the hugepage settings 
 ```
  chdef  noderange  addkcmdline=""
  nodeset all osimage=edr741
  rsetboot all net -u
- rpower all on
+ rpower all reset
 ```
-## end
+## 
