@@ -92,7 +92,7 @@ node03: done
 node04: done
 
 ```
-## go to the one of the compute node and start to run the linpack test 
+## 11 go to the one of the compute node and start to run the linpack test 
 
 ```
 [root@mgt ~]# ssh node01
@@ -117,4 +117,21 @@ echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
 ## you should update the code to use the /root/peter/cluster/xhpl for scinet version xhpl linpack run 
 
 ```
+## 12:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
+```
 
+ chdef  noderange  addkcmdline="hugepagesz=1G hugepages=360 default_hugepagesz=1G" 
+ nodeset all osimage=edr741
+ rsetboot all net -u
+ rpower all on 
+
+```
+## 13：	you should use the special xhpl version (scinet version xhpl in /root/peter/cluster ) with hugepage linpack run 
+## 14: disabe the hugepage settings 
+```
+ chdef  noderange  addkcmdline=""
+ nodeset all osimage=edr741
+ rsetboot all net -u
+ rpower all on
+```
+## end
