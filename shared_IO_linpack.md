@@ -1,9 +1,33 @@
 ## 1:   use asu tools to flash the CMOS settings 
-## 2:   pasu all batch stark1.cmos
-## 3:   reboot to make sure the stark1.cmos take effect
-## 4:   pasu all batch stark2.cmos
-## 5:   reboot to make sure the stark2.cmos take effect
-## 6:   use the edr741 osimage  for netboot all the node 
+```
+[root@mgt ~]# cat stark1.cmos
+loaddefault BootOrder
+loaddefault uEFI
+set OperatingModes.ChooseOperatingMode "Maximum Performance"
+
+[root@mgt ~]# pasu all batch stark1.cmos
+```
+## 2:   reboot to make sure the stark1.cmos take effect
+```
+[root@mgt ~]# cat stark1.cmos
+loaddefault BootOrder
+loaddefault uEFI
+set OperatingModes.ChooseOperatingMode "Maximum Performance"
+[root@mgt ~]# cat stark2.cmos
+set OperatingModes.ChooseOperatingMode "Custom Mode"
+set Processors.CPUPstateControl Cooperative
+set Processors.SNC Disable
+set DevicesandIOPorts.Com1TerminalEmulation VT-UTF8
+set DevicesandIOPorts.Com1ActiveAfterBoot Enable
+set DevicesandIOPorts.Com1FlowControl Hardware
+set DiskGPTRecovery.DiskGPTRecovery None
+set EnableDisableAdapterOptionROMSupport.OnboardVideo UEFI
+
+[root@mgt ~]#  pasu all batch stark2.cmos
+
+```
+## 3:   reboot to make sure the stark2.cmos take effect
+## 4:   use the edr741 osimage  for netboot all the node 
 
 ```
 nodeset all osimage=edr741
@@ -11,14 +35,18 @@ rsetboot all net -u
 rpower all reset
 
 ```
-## 7:   update the opensm.conf to all compute node 
+## 5:   update the opensm.conf to all compute node 
 
 ```
- pscp opensm.conf all:/etc/opensm/
- ssh node01 service opensmd restart
+ [root@mgt ~]# cat opensm.conf
+ virt_enabled 2
+ qos true
+
+ [root@mgt ~]# pscp opensm.conf all:/etc/opensm/
+ [root@mgt ~]# ssh node01 service opensmd restart
  
 ```
-## 8:   check all node to make sure the ib port is up and active 
+## 6:   check all node to make sure the ib port is up and active 
 
 ```
 [root@mgt install]#  psh all ibstat | grep Active
@@ -31,10 +59,10 @@ node02:                 State: Active
 node01:                 State: Active
 node08:                 State: Active
 
-## if you have problem to active the ib port ,retry the step 7 & 8
+## if you have problem to active the ib port ,retry the step 5 & 5
 
 ```
-## 9:   update the hostfile and sync to compute node 
+## 7:   update the hostfile and sync to compute node 
 
 ```
 [root@mgt ~]# cat hostfile
@@ -50,7 +78,7 @@ node03: done
 node04: done
 
 ```
-## 10:  update the HPL.dat file ,then sync to all node 
+## 8:  update the HPL.dat file ,then sync to all node 
 
 ```
 [root@mgt ~]# cat HPL.dat
@@ -92,7 +120,7 @@ node03: done
 node04: done
 
 ```
-## 11 go to the one of the compute node and start to run the linpack test 
+## 9 go to the one of the compute node and start to run the linpack test 
 
 ```
 [root@mgt ~]# ssh node01
@@ -117,7 +145,7 @@ echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
 ## you should update the code to use the /root/peter/cluster/xhpl for scinet version xhpl linpack run 
 
 ```
-## 12:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
+## 10:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
 ```
 
  chdef  noderange  addkcmdline="hugepagesz=1G hugepages=360 default_hugepagesz=1G" 
@@ -126,14 +154,14 @@ echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
  rpower all reset
 
 ```
-## 13:	setup the hugepage related settings after node is up and running 
+## 11:	setup the hugepage related settings after node is up and running 
 ```
 psh c1  hugeadm --create-global-mounts --set-recommended-shmmax
 psh c1  cpupower frequency-set -g performance
 
 ```
-## 14:	you should use the special xhpl version (scinet version xhpl in /root/peter/cluster ) with hugepage linpack run 
-## 15:  disabe the hugepage settings 
+## 12:	you should use the special xhpl version (scinet version xhpl in /root/peter/cluster ) with hugepage linpack run 
+## 13:  disabe the hugepage settings 
 ```
  chdef  noderange  addkcmdline=""
  nodeset all osimage=edr741
