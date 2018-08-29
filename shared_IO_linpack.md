@@ -138,10 +138,9 @@ mpirun -genv I_MPI_FABRICS=dapl -machinefile hostfile   -genv I_MPI_FALLBACK=dis
 # mpirun -genv I_MPI_FABRICS=dapl -genv I_MPI_FALLBACK=disable -genv I_MPI_OFA_ADAPTER_NAME='mlx5_0'  -machinefile hostfile -np 2 -ppn 1 /opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/benchmarks/mp_linpack/xhpl_intel64_static | tee /install/static_74_edr.log
 echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
 [root@node01 cluster]#
-
+```
 ## 10:  you should update the code to use the /root/peter/cluster/xhpl for scinet version xhpl linpack run 
 
-```
 ## 11:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
 ```
 
