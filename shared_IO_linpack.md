@@ -140,7 +140,16 @@ echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
 [root@node01 cluster]#
 ```
 ## 10:  you should update the code to use the /root/peter/cluster/xhpl for scinet version xhpl linpack run 
+```
+[root@mgt install]# ssh node01
+Last login: Wed Aug 29 06:57:13 2018 from 172.20.0.1
+[root@node01 ~]# md5sum /root/peter/cluster/xhpl
+fdc1e760bd838a8b5b5f5a1d45083df6  /root/peter/cluster/xhpl
 
+
+# /root/peter/cluster/xhpl is the integrated in the edr741 osimage 
+
+```
 ## 11:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
 ```
 
