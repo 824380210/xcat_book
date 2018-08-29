@@ -1,4 +1,4 @@
-## 1:   use asu tools to flash the CMOS settings 
+## 1:   use asu tools to flash the first step  CMOS settings 
 ```
 [root@mgt ~]# cat stark1.cmos
 loaddefault BootOrder
@@ -6,13 +6,11 @@ loaddefault uEFI
 set OperatingModes.ChooseOperatingMode "Maximum Performance"
 
 [root@mgt ~]# pasu all batch stark1.cmos
+
 ```
 ## 2:   reboot to make sure the stark1.cmos take effect
+## 3:   use asu tools to flash the second step CMOS settings 
 ```
-[root@mgt ~]# cat stark1.cmos
-loaddefault BootOrder
-loaddefault uEFI
-set OperatingModes.ChooseOperatingMode "Maximum Performance"
 [root@mgt ~]# cat stark2.cmos
 set OperatingModes.ChooseOperatingMode "Custom Mode"
 set Processors.CPUPstateControl Cooperative
@@ -26,8 +24,7 @@ set EnableDisableAdapterOptionROMSupport.OnboardVideo UEFI
 [root@mgt ~]#  pasu all batch stark2.cmos
 
 ```
-## 3:   reboot to make sure the stark2.cmos take effect
-## 4:   use the edr741 osimage  for netboot all the node 
+## 4:   use the edr741 osimage  for netboot all the node;reboot will cause the second cmos setting take effect 
 
 ```
 nodeset all osimage=edr741
@@ -35,7 +32,7 @@ rsetboot all net -u
 rpower all reset
 
 ```
-## 5:   update the opensm.conf to all compute node 
+## 5:   after all node up and running , update the opensm.conf to all compute node 
 
 ```
  [root@mgt ~]# cat opensm.conf
@@ -120,7 +117,7 @@ node03: done
 node04: done
 
 ```
-## 9 go to the one of the compute node and start to run the linpack test 
+## 9:  go to the one of the compute node and start to run the linpack test 
 
 ```
 [root@mgt ~]# ssh node01
@@ -142,10 +139,10 @@ mpirun -genv I_MPI_FABRICS=dapl -machinefile hostfile   -genv I_MPI_FALLBACK=dis
 echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
 [root@node01 cluster]#
 
-## you should update the code to use the /root/peter/cluster/xhpl for scinet version xhpl linpack run 
+## 10:  you should update the code to use the /root/peter/cluster/xhpl for scinet version xhpl linpack run 
 
 ```
-## 10:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
+## 11:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
 ```
 
  chdef  noderange  addkcmdline="hugepagesz=1G hugepages=360 default_hugepagesz=1G" 
@@ -154,14 +151,14 @@ echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
  rpower all reset
 
 ```
-## 11:	setup the hugepage related settings after node is up and running 
+## 12:	setup the hugepage related settings after node is up and running 
 ```
 psh c1  hugeadm --create-global-mounts --set-recommended-shmmax
 psh c1  cpupower frequency-set -g performance
 
 ```
-## 12:	you should use the special xhpl version (scinet version xhpl in /root/peter/cluster ) with hugepage linpack run 
-## 13:  disabe the hugepage settings 
+## 13:	you should use the special xhpl version (scinet version xhpl in /root/peter/cluster ) with hugepage linpack run 
+## 14:  disabe the hugepage settings 
 ```
  chdef  noderange  addkcmdline=""
  nodeset all osimage=edr741
