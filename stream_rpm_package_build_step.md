@@ -271,6 +271,29 @@ Triad:          81019.5     0.035591     0.035547     0.035665
 Triad:          82620.9     0.034955     0.034858     0.035269
 Triad:         157241.4     0.018389     0.018316     0.018830
 [root@node07 ~]#
+# another example for stream ,but with different config
+#
+[root@node01 ~]# lscpu | grep Intel
+Vendor ID:             GenuineIntel
+Model name:            Intel(R) Xeon(R) Platinum 8176 CPU @ 2.10GHz
+[root@node01 ~]# rpm -ivh stream_skylake-1.0-1.el7.x86_64.rpm
+Preparing...                          ################################# [100%]
+        package stream_skylake-1.0-1.el7.x86_64 is already installed
+[root@node01 ~]# build_stream_scripts.sh
+28
+CPU1 CORES is   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+CPU2 CORES is   [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
+CPUS CORES is   [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55]
+[root@node01 ~]# bash run_mystream.sh | grep Triad
+Triad:         101042.2     0.028560     0.028503     0.028612
+Triad:         102640.8     0.028136     0.028059     0.028190
+Triad:         199418.8     0.014506     0.014442     0.014553
+[root@node01 ~]#
 
+# 
+# 从结果看，CPU核数越多，成绩越好，不知道这个是不是正确的，毕竟这里只有两个配置  
+# 
+#
+# 
 ```
 
