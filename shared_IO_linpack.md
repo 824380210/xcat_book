@@ -149,6 +149,25 @@ fdc1e760bd838a8b5b5f5a1d45083df6  /root/peter/cluster/xhpl
 
 # /root/peter/cluster/xhpl is the integrated in the edr741 osimage 
 
+# see my example here 
+
+[root@node06 cluster]# cat hugepage_EDR.sh
+#source ./edr_env.sh
+fmt=`date +%Y%m%d%H%M%S`
+mount | grep mgt >/dev/null
+if [ $? -ne 0 ];then
+        echo -e "Start to mount the mgt node for log store "
+        mount mgt:/install /install
+fi
+mount | grep mgt
+#
+#mpirun -genv I_MPI_FABRICS=dapl -machinefile hostfile   -genv I_MPI_FALLBACK=disable -genv I_MPI_OFA_ADAPTER_NAME='mlx5_0' -np 2 -ppn 1 /opt/intel/compilers_and_libraries_2017.5.239/linux/mkl/benchmarks/mp_linpack/xhpl_intel64_dynamic | tee /install/linpack-${fmt}.log
+mpirun -genv I_MPI_FABRICS=ofa -machinefile hostfile   -genv I_MPI_FALLBACK=disable -genv I_MPI_OFA_NUM_ADAPTERS=1 -genv  I_MPI_DEBUG=5 -genv HPL_LARGEPAGE=2   -np 2 -ppn 1 ./xhpl | tee /install/hugepag_linpack-${fmt}.log
+# mpirun -genv I_MPI_FABRICS=dapl -genv I_MPI_FALLBACK=disable -genv I_MPI_OFA_ADAPTER_NAME='mlx5_0'  -machinefile hostfile -np 2 -ppn 1 /opt/intel/compilers_and_libraries_2018.1.163/linux/mkl/benchmarks/mp_linpack/xhpl_intel64_static | tee /install/static_74_edr.log
+echo -e "LOG FILE IS  /install/linpack-${fmt}.log  \n"
+
+
+
 ```
 ## 11:	  hugepage setup for CPU core bigger than 24 node ,use following to enable the hugepage 
 ```
