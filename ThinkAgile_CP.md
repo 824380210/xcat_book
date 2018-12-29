@@ -1,6 +1,6 @@
 # 1 : prepare the VM for as a test server (or L1 Server )
-#### a: install the VM with 8G memory and 40G hdd ,minimal install with default network NAT to connect to the Host Linux
-#### b: update the yum for software update (tftp/dhcp/http/vim/...)
+#### A: install the VM with 8G memory and 40G hdd ,minimal install with default network NAT to connect to the Host Linux
+#### B: update the yum for software update (tftp/dhcp/http/vim/...)
 ```
 vi /etc/yum.repos.d/local.repo
 yum install xinetd -y
@@ -20,7 +20,7 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 vim /etc/sysconfig/network-scripts/ifcfg-eth0
 
 ```
-#### c: some output example for verify above command
+#### C: some output example for verify above command
 ```
 # check the yum repo
 [root@thinkagile_cp ~]# cat /etc/yum.repos.d/local.repo
@@ -30,7 +30,7 @@ baseurl=http://192.168.122.1/rhels7.5/
 enabled=1
 gpgcheck=0
 
-# check the rpm that have been install 
+#### D: check the rpm that have been install 
 [root@thinkagile_cp ~]# rpm -aq | grep -E 'tftp|xinetd|dhcp|httpd|vim'
 tftp-server-5.2-22.el7.x86_64
 dhcp-4.2.5-68.el7.x86_64
@@ -45,7 +45,7 @@ httpd-2.4.6-80.el7.x86_64
 vim-filesystem-7.4.160-4.el7.x86_64
 dhcp-common-4.2.5-68.el7.x86_64
 
-# check the service that enable when system boot
+#### E: check the service that enable when system boot
 [root@thinkagile_cp ~]# cat /etc/xinetd.d/tftp
 # default: off
 # description: The tftp server serves files using the trivial file transfer \
@@ -79,7 +79,7 @@ enabled
 
 
 ```
-# dhcpd.conf example 
+#### F: dhcpd.conf example 
 ```
 default-lease-time 600;
 max-lease-time 7200;
@@ -99,14 +99,14 @@ subnet 172.20.0.0 netmask 255.255.0.0 {
 
 ```
 
-# test the DHCP service 
+#### G: test the DHCP service 
 ```
 1: put you labtop RJ45 port to the switch which have a ethernet connect to the VM
 2: verify the labtop if it can obtail the IP from the VM or not 
 
 ```
 
-# test the tftp service 
+#### H: test the tftp service 
 ```
 # create a file in the /var/lib/tftpboot directory or other directory that tftp service should be access 
 # the default tftp chroot directory is define in /etc/xinetd.d/tftp and you can change it base on your need 
@@ -131,3 +131,14 @@ test_date
 
 
 ```
+#### I: Q&A for the VM preparation
+```
+1 : for tftp service ,make sure if the xined service enable and controle the tftp service 
+2 : make sure the /var/lib/tftpboot have the correct permission for tftp access the file (download )
+3 : ...
+
+```
+
+# Prepare the image from cloudistics share folder 
+#### A: it is time Base Best Recipt ,and now the [ BR for ThinkAgile 20181207 18D version ](https://datacentersupport.lenovo.com/us/en/solutions/ht507703)
+
