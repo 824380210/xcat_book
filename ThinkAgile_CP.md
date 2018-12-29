@@ -79,6 +79,26 @@ enabled
 
 
 ```
+# dhcpd.conf example 
+```
+default-lease-time 600;
+max-lease-time 7200;
+#log-facility local7;
+subnet 172.20.0.0 netmask 255.255.0.0 {
+    max-lease-time 43200;
+    min-lease-time 43200;
+    default-lease-time 43200;
+    option routers  172.20.0.1;
+    next-server  172.20.0.1;
+    option domain-name "cluster";
+    option domain-name-servers  172.20.0.1;
+    option domain-search  "cluster";
+ #   filename "gpxelinux.0";
+    range dynamic-bootp 172.20.255.1 172.20.255.254;
+}
+
+```
+
 # test the DHCP service 
 ```
 1: put you labtop RJ45 port to the switch which have a ethernet connect to the VM
