@@ -141,5 +141,43 @@ test_date
 
 # 2 Prepare the image from cloudistics share folder 
 #### A: it is time Base Best Recipt ,and now the [ BR for ThinkAgile 20181207 18D version ](https://datacentersupport.lenovo.com/us/en/solutions/ht507703)
-#### B: download the cloudistics image from cloudistics website [cloudistics image ](https://owncloud.cloudistics.com/index.php/s/yhmXnk1sNKWhUEy) ask TE or WWTE for the latest password if you are in need
-#### C: ![ cloudistics image ](https://github.com/824380210/xcat_book/blob/master/thinkAgile_CP_1.jpg)
+#### B: download the cloudistics image from cloudistics website [cloudistics image ](https://owncloud.cloudistics.com/index.php/s/yhmXnk1sNKWhUEy) , ask TE or WWTE for the latest password if you are in need
+#### C: Example for the cloudistics image:  ![ cloudistics image ](https://github.com/824380210/xcat_book/blob/master/thinkAgile_CP_1.jpg)
+#### D: Example of the command to run after download 
+```
+# Get the cloudistics_4.0 GA image 
+[root@test data2]# cd ThinkAgile_CP/
+[root@test ThinkAgile_CP]# ls
+cloudistics_4.0-GA-20181220.zip 
+[root@test ThinkAgile_CP]# ll
+total 31301552
+-rw-r--r-- 1 root root 16026393725 Dec 21 02:20 cloudistics_4.0-GA-20181220.zip
+
+# Copy the image to the test server (L1 server / VM )
+[root@test ThinkAgile_CP]# scp -P 21122 cloudistics_4.0-GA-20181220.zip 10.186.95.120:/root/
+
+# Unzip all the file in the /var/lib/tftpboot directory
+   mkdir ThinkAgile_CP_GA_4.0
+   cd ThinkAgile_CP_GA_4.0/
+   unzip ../cloudistics_4.0-GA-20181220.zip
+   cd 4.0\ GA\ Update/
+   scp -r * 192.168.122.126:/var/lib/tftpboot/      < Copy the content to the VM in my lab >
+
+```
+#### E: Q&A 
+
+# 3: Switch FW upgrade 
+#### A: General setup for the EdgeCore switch
+```
+Baud: 115200
+Data bits: 8
+Stop bits: 1
+Paraity: none
+Flow control: none
+
+Default username : admin
+Default password : pica8
+
+New Password: ioctl960    < Should be change after first login >
+
+```
