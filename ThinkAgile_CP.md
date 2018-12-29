@@ -139,6 +139,7 @@ test_date
 
 ```
 
-# Prepare the image from cloudistics share folder 
+# 2 Prepare the image from cloudistics share folder 
 #### A: it is time Base Best Recipt ,and now the [ BR for ThinkAgile 20181207 18D version ](https://datacentersupport.lenovo.com/us/en/solutions/ht507703)
-
+#### B: download the cloudistics image from cloudistics website [cloudistics image ](https://owncloud.cloudistics.com/index.php/s/yhmXnk1sNKWhUEy) ask TE or WWTE for the latest password if you are in need
+#### C: ![ cloudistics image ](https://github.com/824380210/xcat_book/blob/master/thinkAgile_CP_1.jpg)
